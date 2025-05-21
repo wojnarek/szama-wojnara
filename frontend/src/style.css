@@ -1,0 +1,37 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+.navbar {
+  @apply sticky top-0 z-10 w-full h-[10vh] bg-gray-800 flex items-center justify-center;
+}
+
+.container {
+  @apply w-full max-w-screen-md mx-auto px-4 flex items-center justify-between h-full;
+}
+
+
+.search-input {
+  @apply w-full sm:w-60 p-2 rounded-md border border-gray-400 outline-none;
+}
+
+
+.map-container {
+  @apply w-full h-[90vh];
+}
+
+
+.map-wrapper {
+  @apply flex justify-center items-center w-full h-[90vh] overflow-hidden;
+}
+
+.search-wrapper {
+  @apply flex justify-center items-center w-full h-full;
+}
+
+html, body, #app {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
