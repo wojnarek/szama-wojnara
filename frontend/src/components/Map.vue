@@ -5,12 +5,16 @@
 </template>
 
 <script setup>
-import { onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
+import axios from 'axios'
 
-onMounted(() => {
-  
+const points = ref([])
+
+onMounted(async () => {
+  const res = await axios.get(import.meta.env.VITE_API_URL + '/points')
+    points.value = res.data
 
 //default location, my city
   const defaultLat = 50.316753
@@ -20,10 +24,18 @@ onMounted(() => {
   //set map to defualt location
   const map = L.map('map').setView([defaultLat, defaultLng], defaultZoom)
 
+  
+
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
     attribution: '© OpenStreetMap'
   }).addTo(map)
+
+  points.value.forEach(point => {
+      L.marker([point.latitude, point.longitude])
+        .addTo(map)
+        .bindPopup(point.name)
+    })
 
   //get user location
   if (navigator.geolocation) {
