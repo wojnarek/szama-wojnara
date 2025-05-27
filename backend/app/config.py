@@ -1,5 +1,5 @@
 import os
-from pydantic import BaseSettings
+from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     dynamodb_url: str = os.getenv("DYNAMODB_URL", "")

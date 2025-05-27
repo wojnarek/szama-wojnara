@@ -13,8 +13,9 @@ import axios from 'axios'
 const points = ref([])
 
 onMounted(async () => {
-  const res = await axios.get(import.meta.env.VITE_API_URL + '/points')
+  const res = await axios.get(import.meta.env.VITE_API_URL + '/points/')
     points.value = res.data
+
 
 //default location, my city
   const defaultLat = 50.316753
@@ -28,7 +29,6 @@ onMounted(async () => {
 
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
-    attribution: '© OpenStreetMap'
   }).addTo(map)
 
   points.value.forEach(point => {
