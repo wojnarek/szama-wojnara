@@ -18,11 +18,14 @@ import PointModal from '@/components/PointModal.vue'
 
 const points = ref([])
 const selectedPoint = ref(null)
+const urlPointId = ref(null)
 let map
 onMounted(async () => {
-  const res = await axios.get(import.meta.env.VITE_API_URL + '/points/')
-    points.value = res.data
+  const params = new URLSearchParams(window.location.search)
+  urlPointId.value = params.get('pointId')
 
+  const res = await axios.get(import.meta.env.VITE_API_URL + '/points/')
+  points.value = res.data
 
 //default location, my city
   const defaultLat = 50.316753
@@ -39,11 +42,11 @@ onMounted(async () => {
   }).addTo(map)
 
  points.value.forEach(point => {
-    // Tworzymy kontener na popup dla każdego markera
+    //Container for markers
     const container = document.createElement('div')
     container.id = `popup-vue-${point.id}`
 
-    // Renderujemy SmallPop do kontenera
+    //Smallpopup render
     render(
       h(SmallPop, {
         point,
@@ -57,7 +60,18 @@ onMounted(async () => {
 
     const marker = L.marker([point.latitude, point.longitude]).addTo(map)
     marker.bindPopup(container)
+
+    if (urlPointId && point.id === urlPointId) {
+      selectedPoint.value = point
+      map.setView([point.latitude, point.longitude], 16)
+      marker.openPopup()
+}
+
+
   })
+
+
+
 
   //get user location
   if (navigator.geolocation) {
