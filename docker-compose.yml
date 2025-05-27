@@ -17,8 +17,8 @@ services:
     environment:
       - PYTHONBUFFERED=1
       - ENV=development
-      - CORS_ORIGINS=http://localhost:8082
-      - DYNAMODB_URL=http://dynamodb:8000  # tak widzi to backend w sieci dockerowej
+      - CORS_ORIGINS=*
+      - DYNAMODB_URL=http://dynamodb:8000  
       - AWS_REGION=eu-central-1
       - AWS_ACCESS_KEY_ID=xxx
       - AWS_SECRET_ACCESS_KEY=yyy

@@ -1,17 +1,24 @@
 <template>
   <div class="map-container relative w-full h-[90vh]">
     <div id="map" class="absolute inset-0 w-full h-full"></div>
+    <div id="popup-container" style="display:none;"></div>
+    <PointModal v-if="selectedPoint" :point="selectedPoint" @close="selectedPoint = null" />
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { render, h } from 'vue'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import axios from 'axios'
 
-const points = ref([])
+import SmallPop from '@/components/SmallPopup.vue'
+import PointModal from '@/components/PointModal.vue'
 
+const points = ref([])
+const selectedPoint = ref(null)
+let map
 onMounted(async () => {
   const res = await axios.get(import.meta.env.VITE_API_URL + '/points/')
     points.value = res.data
@@ -31,11 +38,26 @@ onMounted(async () => {
     maxZoom: 19,
   }).addTo(map)
 
-  points.value.forEach(point => {
-      L.marker([point.latitude, point.longitude])
-        .addTo(map)
-        .bindPopup(point.name)
-    })
+ points.value.forEach(point => {
+    // Tworzymy kontener na popup dla każdego markera
+    const container = document.createElement('div')
+    container.id = `popup-vue-${point.id}`
+
+    // Renderujemy SmallPop do kontenera
+    render(
+      h(SmallPop, {
+        point,
+        onMore: () => {
+          selectedPoint.value = point
+          map.closePopup()
+        }
+      }),
+      container
+    )
+
+    const marker = L.marker([point.latitude, point.longitude]).addTo(map)
+    marker.bindPopup(container)
+  })
 
   //get user location
   if (navigator.geolocation) {
