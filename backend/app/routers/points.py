@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException
-from app.schemas.points import Point
+from app.schemas.points import Point, PointDetails
 from app.config import settings
 import boto3
 
@@ -29,3 +29,23 @@ def getAllPoints():
         return points
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/{point_id}", response_model = PointDetails)
+async def getPointDetails(point_id: str):
+    
+        response = table.get_item(
+            Key={'id': point_id},
+            ProjectionExpression = "id, #nme, latitude, longitude, main_category, subcategories, #own, google_url, description",
+            ExpressionAttributeNames = {
+                "#nme": "name", #reserved keyword nme = name
+                "#own": "owner" #reserverd keyword own = owner
+            }
+        )
+        
+        item = response.get('Item')
+        
+        if not item:
+            raise HTTPException(status_code=404, detail="Nie znaleziono punktu")
+        return item
+   

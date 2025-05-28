@@ -3,6 +3,14 @@ from pydantic import BaseModel
 class Point(BaseModel):
     id: str
     name: str
+    main_category: str
+    subcategories: list[str] = []
+    latitude: float
+    longitude: float
+
+class PointDetails(BaseModel):
+    id: str
+    name: str
     description: str
     main_category: str
     subcategories: list[str] = []
@@ -10,4 +18,5 @@ class Point(BaseModel):
     longitude: float
     google_url: str
     owner: str
+    
     

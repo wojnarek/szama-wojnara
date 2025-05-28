@@ -79,6 +79,12 @@
         >
           Link skopiowany do schowka!
         </div>
+        <div
+          v-if="copyError"
+          class="absolute left-1/2 bottom-4 -translate-x-1/2 px-5 py-2 bg-red-600 text-white rounded-lg shadow font-medium animate-modal-pop"
+        >
+          Nie udało się skopiować linku. Skopiuj ręcznie: {{ copyUrl }}
+        </div>
       </div>
     </div>
   </transition>
@@ -91,6 +97,8 @@ const props = defineProps({
 })
 const emit = defineEmits(['close'])
 const showAlert = ref(false)
+const copyError = ref(false)
+const copyUrl = ref('')
 
 function onClose() {
   emit('close')
@@ -102,10 +110,22 @@ function openUrl(url) {
 
 function shareLocation() {
   const url = `${window.location.origin}/?pointId=${props.point.id}`
-  navigator.clipboard.writeText(url)
-  // Toast — wyświetl info o skopiowaniu
-  showAlert.value = true
-  setTimeout(() => showAlert.value = false, 2000)
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(url)
+      .then(() => {
+        showAlert.value = true
+        setTimeout(() => showAlert.value = false, 2000)
+      })
+      .catch(() => {
+        copyUrl.value = url
+        copyError.value = true
+        setTimeout(() => copyError.value = false, 3500)
+      })
+  } else {
+    copyUrl.value = url
+    copyError.value = true
+    setTimeout(() => copyError.value = false, 3500)
+  }
 }
 </script>
 
