@@ -37,6 +37,7 @@
         <div class="px-7 py-5 text-gray-800 text-base leading-snug flex items-center gap-2">
           <span class="text-xl text-blue-500">📝</span>
           <span>{{ point.description }}</span>
+          <span>{{ point.owner }}</span>
         </div>
         <div class="border-t border-gray-200 mx-7"></div>
 

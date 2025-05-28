@@ -18,5 +18,6 @@ class PointDetails(BaseModel):
     longitude: float
     google_url: str
     owner: str
+    owner_name: str
     
     
