@@ -2,6 +2,7 @@ import boto3
 import pydantic
 from app.config import settings
 from app.schemas.points import Point, PointDetails
+from app.services.users import getUsernameById
 
 dynamodb = boto3.resource(
     "dynamodb",
@@ -13,7 +14,6 @@ dynamodb = boto3.resource(
 
 point_table = dynamodb.Table("points")
 
-user_table = dynamodb.Table("users")
 
 def getAllPointsFromDB():
         response = point_table.scan()
@@ -29,7 +29,7 @@ def getPointDetailFromDB(point_id: str):
     
     response = point_table.get_item(
         Key={'id': point_id},
-        ProjectionExpression = "id, #nme, latitude, longitude, main_category, subcategories, #own, google_url, description",
+        ProjectionExpression = "id, #nme, latitude, longitude, main_category, subcategories, #own, google_url, description, owner_name",
             ExpressionAttributeNames = {
                 "#nme": "name", #reserved keyword nme = name
                 "#own": "owner" #reserverd keyword own = owner
@@ -37,6 +37,13 @@ def getPointDetailFromDB(point_id: str):
     )
     
     item = response.get('Item')
+        
+    user = getUsernameById(item['owner'])
+    
+    if user:
+        item['owner_name'] = user['username']
+    else:
+        item['owner_name'] = 'siakalaka'
     
     return item
     

@@ -3,11 +3,24 @@
     <div id="map" class="absolute inset-0 w-full h-full"></div>
     <div id="popup-container" style="display:none;"></div>
     <PointModal v-if="selectedPoint" :point="selectedPoint" @close="selectedPoint = null" />
+
+    <transition name="modal-fade">
+      <div
+        v-if="showNewMarkerForm"
+        class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-[9999]"
+      >
+        <NewMarker
+          :latitude="newMarkerLat"
+          :longitude="newMarkerLng"
+          @close="handleCloseForm"
+          @submit="handleCloseForm" />
+      </div>
+    </transition>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { render, h } from 'vue'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
@@ -23,30 +36,33 @@ import sushiIcon from '@/assets/markers/sushi.png'
 import chineseIcon from '@/assets/markers/chinese.png'
 import fancy_restaurantIcon from '@/assets/markers/fancy_restaurant.png'
 
-
 import SmallPop from '@/components/SmallPopup.vue'
 import PointModal from '@/components/PointModal.vue'
+import NewMarker from '@/components/NewMarker.vue'
+
+const showNewMarkerForm = ref(false)
+const newMarkerLat = ref(null)
+const newMarkerLng = ref(null)
 
 const points = ref([])
 const selectedPoint = ref(null)
 const urlPointId = ref(null)
 let map
 
-//function to setup icon related to category
 function getMarkerIcon(category) {
-  const normalized = (category || '').toLowerCase()
+  const normalized = (category || '')
   let iconUrl
   switch (normalized) {
     case 'Kebab': iconUrl = kebabIcon; break
     case 'Pizza': iconUrl = pizzaIcon; break
-    case 'Burger': iconUrl = burgerIcon; break
+    case 'Hamburger': iconUrl = hamburgerIcon; break
     case 'Restauracja': iconUrl = restaurantIcon; break
     case 'Karczma': iconUrl = karczmaIcon; break
     case 'Meksykańskie': iconUrl = mexicoIcon; break
     case 'Sushi': iconUrl = sushiIcon; break
     case 'Chinol': iconUrl = chineseIcon; break
     case 'Wykwintna restauracja': iconUrl = fancy_restaurantIcon; break
-    default: iconUrl = kebabIcon // domyślna, np. kebab albo klasyczna pinezka
+    default: iconUrl = kebabIcon
   }
   return L.icon({
     iconUrl,
@@ -57,11 +73,29 @@ function getMarkerIcon(category) {
   })
 }
 
+function handleShowPointModal(e) {
+  selectedPoint.value = e.detail
+}
+
+function handleCloseForm() {
+  showNewMarkerForm.value = false
+  newMarkerLat.value = null
+  newMarkerLng.value = null
+}
+
+onMounted(() => {
+  window.addEventListener('show-point-modal', handleShowPointModal)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('show-point-modal', handleShowPointModal)
+})
+
 onMounted(async () => {
   const params = new URLSearchParams(window.location.search)
   urlPointId.value = params.get('pointId')
 
-  const res = await axios.get(import.meta.env.VITE_API_URL + '/points/')
+  const res = await axios.get(import.meta.env.VITE_API_URL2 + '/points/')
   points.value = res.data
 
   const defaultLat = 50.316753
@@ -79,19 +113,7 @@ onMounted(async () => {
     container.id = `popup-vue-${point.id}`
 
     render(
-      h(SmallPop, {
-        point,
-        async onMore() {
-          try {
-            const res = await axios.get(`${import.meta.env.VITE_API_URL}/points/${point.id}`)
-            selectedPoint.value = res.data
-            map.closePopup()
-            map.setView([point.latitude, point.longitude], 19)
-          } catch (e) {
-            alert('Nie udało się pobrać szczegółów punktu.')
-          }
-        }
-      }),
+      h(SmallPop, { point }),
       container
     )
 
@@ -101,15 +123,12 @@ onMounted(async () => {
     marker.bindPopup(container)
 
     if (urlPointId && point.id === urlPointId) {
-      axios.get(`${import.meta.env.VITE_API_URL}/points/${point.id}`)
+      axios.get(`${import.meta.env.VITE_API_URL2}/points/${point.id}`)
         .then(res => {
           selectedPoint.value = res.data
-          //map.setView([point.latitude, point.longitude], 16)
           marker.openPopup()
         })
-        .catch(() => {
-          // ignoruj, jeśli nie istnieje punkt
-        })
+        .catch(() => { /* ignoruj */ })
     }
   })
 
@@ -126,6 +145,12 @@ onMounted(async () => {
   } else {
     console.warn('Twoja przeglądarka nie obsługuje geolokalizacji.')
   }
+
+  map.on('dblclick', function(e) {
+    newMarkerLat.value = e.latlng.lat
+    newMarkerLng.value = e.latlng.lng
+    showNewMarkerForm.value = true
+  })
 })
 </script>
 

@@ -3,15 +3,13 @@ from app.schemas.points import Point, PointDetails
 from app.config import settings
 from app.services.points import getAllPointsFromDB
 from app.services.points import getPointDetailFromDB
+from app.services.users import getUsernameById
+from app.schemas.users import UserNameAndId
 
 router = APIRouter(
     prefix="/points",
     tags=["points"]
 )
-
-
-
-
 
 
 @router.get("/", response_model=list[Point])
