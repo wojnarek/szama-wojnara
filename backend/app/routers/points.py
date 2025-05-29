@@ -1,10 +1,11 @@
 from fastapi import APIRouter, HTTPException
-from app.schemas.points import Point, PointDetails
+from app.schemas.points import Point, PointDetails, NewPoint
 from app.config import settings
 from app.services.points import getAllPointsFromDB
-from app.services.points import getPointDetailFromDB
-from app.services.users import getUsernameById
-from app.schemas.users import UserNameAndId
+from app.services.points import getPointDetailFromDB, addNewPointToDB
+from app.services.users import checkAccesCode
+from app.schemas.users import UserNameAndId, User
+from uuid import uuid4
 
 router = APIRouter(
     prefix="/points",
@@ -25,3 +26,14 @@ async def getPointDetails(point_id: str):
             raise HTTPException(status_code=404, detail="Nie znaleziono punktu")
         return getPointDetailFromDB(point_id)
    
+   
+@router.post("/", response_model=PointDetails)
+async def addNewPoint(newPoint: NewPoint):
+
+    user = checkAccesCode(newPoint.access_code)
+    
+    if not user:
+        raise HTTPException(status_code=401, detail="Niepoprawny kod dostępu!")
+    addNewPointToDB(newPoint, user)
+    return newPoint
+    

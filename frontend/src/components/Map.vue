@@ -75,6 +75,7 @@ function getMarkerIcon(category) {
 
 function handleShowPointModal(e) {
   selectedPoint.value = e.detail
+  map.setView([e.detail.latitude, e.detail.longitude], 19)
 }
 
 function handleCloseForm() {
@@ -95,7 +96,7 @@ onMounted(async () => {
   const params = new URLSearchParams(window.location.search)
   urlPointId.value = params.get('pointId')
 
-  const res = await axios.get(import.meta.env.VITE_API_URL2 + '/points/')
+  const res = await axios.get(import.meta.env.VITE_API_URL + '/points/')
   points.value = res.data
 
   const defaultLat = 50.316753
@@ -123,7 +124,7 @@ onMounted(async () => {
     marker.bindPopup(container)
 
     if (urlPointId && point.id === urlPointId) {
-      axios.get(`${import.meta.env.VITE_API_URL2}/points/${point.id}`)
+      axios.get(`${import.meta.env.VITE_API_URL}/points/${point.id}`)
         .then(res => {
           selectedPoint.value = res.data
           marker.openPopup()

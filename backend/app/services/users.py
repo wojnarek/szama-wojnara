@@ -1,6 +1,6 @@
 import boto3
 from app.config import settings
-import boto3
+from boto3.dynamodb.conditions import Key
 from app.schemas.users import User
 
 dynamodb = boto3.resource(
@@ -15,7 +15,8 @@ user_table = dynamodb.Table("users")
 
 
 def getUsernameById(user_id: str):
-    print(f"user id to: {user_id}")
+    
+    
     response = user_table.get_item(
         Key={'id': user_id},
         ProjectionExpression = "id, username"
@@ -26,3 +27,15 @@ def getUsernameById(user_id: str):
     print(f"user z bazy: {item}")
     
     return item
+
+def checkAccesCode(code: str):
+
+    response = user_table.query(
+        IndexName='AccessCode',
+        KeyConditionExpression=Key('access_code').eq(code)
+    )
+    items = response.get('Items', [])
+    if items:
+        return items[0]
+    else:
+        return None

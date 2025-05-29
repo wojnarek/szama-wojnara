@@ -84,7 +84,7 @@ async function handleMoreClick() {
   loading.value = true
   error.value = null
   try {
-    const res = await axios.get(import.meta.env.VITE_API_URL2 + '/points/' + props.point.id)
+    const res = await axios.get(import.meta.env.VITE_API_URL + '/points/' + props.point.id)
     window.dispatchEvent(new CustomEvent('show-point-modal', { detail: res.data }))
   } catch (e) {
     error.value = "Nie udało się pobrać szczegółów."

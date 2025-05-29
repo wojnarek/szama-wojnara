@@ -1,17 +1,14 @@
 <template>
   <form
     @submit.prevent="handleSubmit"
-    class="max-w-md mx-auto px-8 py-8 bg-gradient-to-br from-green-100 via-blue-100 to-purple-100 shadow-2xl rounded-[2.5rem] flex flex-col gap-6 animate-fadein fairy-form"
-
-
-
-
-    style="font-family: 'Fredoka', 'Comic Sans MS', cursive, sans-serif;"
+    class="w-full max-w-md sm:max-w-lg mx-auto px-3 sm:px-8 py-6 sm:py-8 bg-gradient-to-br from-green-100 via-blue-100 to-purple-100 shadow-2xl rounded-[2.5rem] flex flex-col gap-5 animate-fadein fairy-form"
+    style="font-family: 'Fredoka', 'Comic Sans MS', cursive, sans-serif; max-width:98vw"
   >
-    <h2 class="text-3xl font-extrabold text-pink-600 text-center mb-1 flex items-center justify-center gap-2 drop-shadow-lg">
+    <h2 class="text-2xl sm:text-3xl font-extrabold text-pink-600 text-center mb-1 flex items-center justify-center gap-2 drop-shadow-lg">
       <span>✨</span> Dodaj nową szamke <span>✨</span>
     </h2>
 
+    <!-- Nazwa -->
     <div>
       <label class="font-semibold block mb-1 text-blue-700 flex items-center gap-1">🏷️ Nazwa punktu</label>
       <input
@@ -28,45 +25,47 @@
       </transition>
     </div>
 
+    <!-- Kategoria -->
     <div class="relative">
-  <label class="font-semibold block mb-1 text-yellow-700 flex items-center gap-1">🍕 Kategoria</label>
-  <button
-    type="button"
-    class="w-full border-2 border-yellow-200 focus:border-yellow-400 focus:ring-2 focus:ring-yellow-200 bg-white rounded-2xl px-4 py-2 text-lg fairy-shadow flex items-center gap-2"
-    @click="showCatDropdown = !showCatDropdown"
-  >
-    <img
-      v-if="category"
-      :src="getCategoryIcon(category)"
-      alt="ikona kategorii"
-      class="w-7 h-7 rounded-full drop-shadow-md transition-transform duration-300"
-      :class="{'scale-110': showCatDropdown}"
-    />
-    <span>{{ category || 'Wybierz kategorię...' }}</span>
-    <svg class="w-4 h-4 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg>
-  </button>
-  <transition name="cat-dropdown-fade">
-    <div
-      v-if="showCatDropdown"
-      class="absolute left-0 z-10 mt-2 w-full bg-white border-2 border-yellow-100 rounded-2xl shadow-xl fairy-shadow"
-    >
-      <ul class="flex flex-col gap-1 py-2">
-        <li
-          v-for="cat in categories"
-          :key="cat"
-          @click="selectCategory(cat)"
-          class="flex items-center gap-3 px-4 py-2 cursor-pointer hover:bg-yellow-50 hover:scale-105 transition-all duration-150 rounded-xl"
+      <label class="font-semibold block mb-1 text-yellow-700 flex items-center gap-1">🍕 Kategoria</label>
+      <button
+        type="button"
+        class="w-full border-2 border-yellow-200 focus:border-yellow-400 focus:ring-2 focus:ring-yellow-200 bg-white rounded-2xl px-4 py-2 text-lg fairy-shadow flex items-center gap-2"
+        @click="showCatDropdown = !showCatDropdown"
+      >
+        <img
+          v-if="category"
+          :src="getCategoryIcon(category)"
+          alt="ikona kategorii"
+          class="w-7 h-7 rounded-full drop-shadow-md transition-transform duration-300"
+          :class="{'scale-110': showCatDropdown}"
+        />
+        <span>{{ category || 'Wybierz kategorię...' }}</span>
+        <svg class="w-4 h-4 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg>
+      </button>
+      <transition name="cat-dropdown-fade">
+        <div
+          v-if="showCatDropdown"
+          class="absolute left-0 z-10 mt-2 w-full bg-white border-2 border-yellow-100 rounded-2xl shadow-xl fairy-shadow"
         >
-          <img :src="getCategoryIcon(cat)" alt="ikona" class="w-7 h-7 rounded-full drop-shadow" />
-          <span class="font-bold text-lg text-yellow-800">{{ cat }}</span>
-        </li>
-      </ul>
+          <ul class="flex flex-col gap-1 py-2">
+            <li
+              v-for="cat in categories"
+              :key="cat"
+              @click="selectCategory(cat)"
+              class="flex items-center gap-3 px-4 py-2 cursor-pointer hover:bg-yellow-50 hover:scale-105 transition-all duration-150 rounded-xl"
+            >
+              <img :src="getCategoryIcon(cat)" alt="ikona" class="w-7 h-7 rounded-full drop-shadow" />
+              <span class="font-bold text-lg text-yellow-800">{{ cat }}</span>
+            </li>
+          </ul>
+        </div>
+      </transition>
     </div>
-  </transition>
-</div>
 
+    <!-- Tagi -->
     <div>
-      <label class="font-semibold block mb-1 text-blue-700 flex items-center gap-1">🏷️ Tagi <span class="text-sm">(po wpisaniu wciśnij enter)</span></label>
+      <label class="font-semibold block mb-1 text-blue-700 flex items-center gap-1">🏷️ Tagi <span class="text-sm">(wpisz, ENTER lub ➕)</span></label>
       <div class="flex flex-wrap gap-2 mb-2 min-h-[30px]">
         <transition-group name="pop" tag="div" class="flex flex-wrap gap-2">
           <span
@@ -81,20 +80,32 @@
           </span>
         </transition-group>
       </div>
-      <input
-        v-model="subcategoryInput"
-        @keydown.enter.prevent="addSubcategory"
-        type="text"
-        class="w-full border-2 border-blue-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-200 bg-white rounded-2xl px-4 py-2 text-lg fairy-shadow transition-all duration-200"
-        placeholder="Opisz szamke kilkoma słowami (max 8.)"
-        :disabled="subcategories.length >= 8"
-        :maxlength="20"
-      />
+      <div class="flex gap-1">
+        <input
+          v-model="subcategoryInput"
+          @keydown.enter.prevent="addSubcategory"
+          @blur="addSubcategory"
+          type="text"
+          class="w-full border-2 border-blue-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-200 bg-white rounded-2xl px-4 py-2 text-lg fairy-shadow transition-all duration-200"
+          placeholder="Opisz szamke kilkoma słowami (max 8.)"
+          :disabled="subcategories.length >= 8"
+          :maxlength="20"
+        />
+        <!-- Dodajemy tag także przyciskem ➕ -->
+        <button
+          type="button"
+          @click="addSubcategory"
+          class="flex items-center justify-center px-3 rounded-2xl bg-blue-200 hover:bg-pink-200 text-blue-800 font-extrabold shadow transition-all text-xl"
+          :disabled="!subcategoryInput.trim() || subcategories.length >= 8"
+          tabindex="-1"
+        >+</button>
+      </div>
       <transition name="fade">
         <span v-if="subcategories.length >= 8" class="text-blue-700 text-xs mt-1">🌟 Limit subkategorii osiągnięty!</span>
       </transition>
     </div>
 
+    <!-- Opis -->
     <div>
       <label class="font-semibold block mb-1 text-green-700 flex items-center gap-1">📝 Opis</label>
       <textarea
@@ -113,6 +124,7 @@
     <input v-model="latitude" type="hidden" readonly />
     <input v-model="longitude" type="hidden" readonly />
 
+    <!-- Kod autoryzacyjny -->
     <div>
       <label class="font-semibold block mb-1 text-purple-700 flex items-center gap-1">🔑 Kod autoryzacyjny</label>
       <input
@@ -125,25 +137,25 @@
       />
     </div>
 
-<div class="flex gap-3 justify-center mt-4">
-  <button
-    type="button"
-    class="px-5 py-2 rounded-2xl bg-gray-200 hover:bg-pink-200 text-gray-700 font-semibold shadow transition-all fairy-shadow"
-    @click="$emit('close')"
-  >❌ Anuluj</button>
-  <button
-    @click="handleSubmit()"
-    type="submit"
-    class="py-2 px-8 rounded-xl bg-gradient-to-r from-lime-300 via-green-200 to-emerald-200 text-green-800 font-extrabold text-lg shadow-xl hover:scale-110 hover:shadow-green-300 transition-all duration-200 fairy-shadow flex items-center gap-2"
-    :disabled="!formValid"
-  >⬆️<span>Dodaj punkt</span>⬆️</button>
-</div>
-
-
+    <!-- Przyciski -->
+    <div class="flex flex-col sm:flex-row gap-3 justify-center mt-2">
+      <button
+        type="button"
+        class="px-5 py-2 rounded-2xl bg-gray-200 hover:bg-pink-200 text-gray-700 font-semibold shadow transition-all fairy-shadow"
+        @click="$emit('close')"
+      >❌ Anuluj</button>
+      <button
+        @click="handleSubmit()"
+        type="submit"
+        class="py-2 px-8 rounded-xl bg-gradient-to-r from-lime-300 via-green-200 to-emerald-200 text-green-800 font-extrabold text-lg shadow-xl hover:scale-110 hover:shadow-green-300 transition-all duration-200 fairy-shadow flex items-center gap-2"
+        :disabled="!formValid"
+      >⬆️<span>Dodaj punkt</span>⬆️</button>
+    </div>
   </form>
 </template>
 
 <script setup>
+import axios from 'axios'
 import { ref, computed, watch } from 'vue'
 const emit = defineEmits(['close', 'submit'])
 const props = defineProps({
@@ -194,7 +206,8 @@ function selectCategory(cat) {
 const subcategories = ref([])
 const subcategoryInput = ref('')
 
-function addSubcategory() {
+function addSubcategory(e) {
+  // e może być undefined jeśli wywołane z blur/przycisku
   const value = subcategoryInput.value.trim()
   if (
     value &&
@@ -206,6 +219,7 @@ function addSubcategory() {
     subcategoryInput.value = ''
   }
 }
+
 function removeSubcategory(i) {
   subcategories.value.splice(i, 1)
 }
@@ -226,21 +240,48 @@ const formValid = computed(() =>
   latitude.value && longitude.value &&
   code.value
 )
-
-function handleSubmit() {
+async function handleSubmit() {
   if (!formValid.value) return
   const payload = {
     name: name.value,
-    category: category.value,
-    subcategories: subcategories.value,
     description: description.value,
+    main_category: category.value,
+    subcategories: subcategories.value,
     latitude: latitude.value,
     longitude: longitude.value,
-    code: code.value
+    access_code: code.value
   }
-  alert('Dane do wysłania: ' + JSON.stringify(payload, null, 2))
-  // emit('submit', payload) // użyj w produkcji
+
+  try {
+    const res = await axios.post(
+      import.meta.env.VITE_API_URL + '/points',
+      payload
+    )
+    // Możesz tu dać snackbar/toast/sukces!
+    alert('Dodano punkt! 🎉')
+    emit('submit', res.data) // zamknij formularz, zaktualizuj mapę itd.
+  } catch (e) {
+    if (e.response && e.response.status === 401) {
+      alert('Niepoprawny kod autoryzacyjny!')
+    } else {
+      alert('Nie udało się dodać punktu. Spróbuj ponownie.')
+    }
+  }
 }
+// function handleSubmit() {
+//   if (!formValid.value) return
+//   const payload = {
+//     name: name.value,
+//     category: category.value,
+//     subcategories: subcategories.value,
+//     description: description.value,
+//     latitude: latitude.value,
+//     longitude: longitude.value,
+//     code: code.value
+//   }
+//   alert('Dane do wysłania: ' + JSON.stringify(payload, null, 2))
+//   // emit('submit', payload) // użyj w produkcji
+// }
 </script>
 
 <style scoped>
@@ -255,7 +296,6 @@ function handleSubmit() {
 }
 
 .fairy-form {
-  /* animacja na wejście */
   animation: fairy-form-pop 0.4s cubic-bezier(.56,1.62,.51,.98);
   font-family: 'Fredoka', 'Comic Sans MS', cursive, sans-serif;
 }
@@ -281,8 +321,6 @@ function handleSubmit() {
   0% { opacity: 0; transform: scale(0.82);}
   100% { opacity: 1; transform: scale(1);}
 }
-
-/* Animacje i przejścia */
 .fade-enter-active, .fade-leave-active {
   transition: opacity 0.25s;
 }
@@ -295,5 +333,19 @@ function handleSubmit() {
 .pop-enter-from, .pop-leave-to {
   opacity: 0;
   transform: scale(0.85);
+}
+
+/* Responsywność: na mobile formularz wyższy, mniejsze marginesy, elastyczna szerokość */
+@media (max-width: 600px) {
+  .fairy-form {
+    border-radius: 1.5rem;
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+    padding-top: 1.2rem !important;
+    padding-bottom: 1.2rem !important;
+  }
+  input, textarea, select, button {
+    font-size: 1.12rem;
+  }
 }
 </style>

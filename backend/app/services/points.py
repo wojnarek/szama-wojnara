@@ -1,8 +1,11 @@
 import boto3
 import pydantic
 from app.config import settings
-from app.schemas.points import Point, PointDetails
+from app.schemas.points import Point, PointDetails, NewPoint
 from app.services.users import getUsernameById
+from app.schemas.users import User
+from uuid import uuid4
+from decimal import Decimal
 
 dynamodb = boto3.resource(
     "dynamodb",
@@ -47,4 +50,25 @@ def getPointDetailFromDB(point_id: str):
     
     return item
     
+
+def addNewPointToDB(newPoint: NewPoint, user: dict):
+    
+    point_id = str(uuid4())
+    
+    url = f"https://maps.google.com/?q={newPoint.latitude},{newPoint.longitude}"
+        
+    point = {
+        'id': point_id,
+        'name': newPoint.name,
+        'description': newPoint.description,
+        'main_category': newPoint.main_category,
+        'subcategories': newPoint.subcategories,
+        'latitude': Decimal(str(newPoint.latitude)),
+        'longitude': Decimal(str(newPoint.longitude)),
+        'google_url': url,
+        'owner': user['id'],
+        'owner_name': user['username']
+        }
+    
+    point_table.put_item(Item=point)
     

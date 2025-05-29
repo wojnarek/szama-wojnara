@@ -21,3 +21,13 @@ class PointDetails(BaseModel):
     owner_name: str
     
     
+class NewPoint(BaseModel):
+    name: str
+    description: str
+    main_category: str
+    subcategories: list[str] = []
+    latitude: float
+    longitude: float
+    access_code: str
+    
+    
