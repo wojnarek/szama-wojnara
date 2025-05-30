@@ -13,7 +13,7 @@
           :latitude="newMarkerLat"
           :longitude="newMarkerLng"
           @close="handleCloseForm"
-          @submit="handleCloseForm" />
+          @submit="handleAddPoint" />
       </div>
     </transition>
   </div>
@@ -84,6 +84,27 @@ function handleCloseForm() {
   newMarkerLng.value = null
 }
 
+function addAnimatedMarker(point) {
+  const container = document.createElement('div')
+  container.id = `popup-vue-${point.id}`
+
+  render(
+    h(SmallPop, { point, isNew: true }), // dodajemy prop isNew, jeśli chcesz specjalny efekt w popupie
+    container
+  )
+  const marker = L.marker([point.latitude, point.longitude], {
+    icon: getMarkerIcon(point.main_category),
+    className: 'marker-new'
+  }).addTo(map)
+  marker.bindPopup(container)
+
+  // Dodaj prostą animację na markerze
+  const iconEl = marker._icon
+  if (iconEl) {
+    iconEl.classList.add('marker-animate')
+    setTimeout(() => iconEl.classList.remove('marker-animate'), 2500)
+  }
+}
 onMounted(() => {
   window.addEventListener('show-point-modal', handleShowPointModal)
 })
@@ -101,7 +122,7 @@ onMounted(async () => {
 
   const defaultLat = 50.316753
   const defaultLng = 17.383472
-  const defaultZoom = 15
+  const defaultZoom = 14
 
   map = L.map('map').setView([defaultLat, defaultLng], defaultZoom)
 
@@ -153,6 +174,27 @@ onMounted(async () => {
     showNewMarkerForm.value = true
   })
 })
+
+async function handleAddPoint(payload) {
+  handleCloseForm() // schowaj formularz
+  try {
+    // Tutaj robisz API call
+    const res = await axios.post(import.meta.env.VITE_API_URL + '/points', payload)
+    const newPoint = res.data
+
+    // Dodaj do points:
+    points.value.push(newPoint)
+
+    // Dodaj marker z animacją:
+    addAnimatedMarker(newPoint)
+
+    // Przenieś mapę:
+    map.setView([newPoint.latitude, newPoint.longitude], 19)
+  } catch (err) {
+    alert('Nie udało się dodać punktu.')
+    console.log(err)
+  }
+}
 </script>
 
 <style>
@@ -164,5 +206,14 @@ onMounted(async () => {
 #map {
   width: 100%;
   height: 100%;
+}
+
+.marker-animate {
+  animation: pulse-marker 0.5s alternate 4;
+  box-shadow: 0 0 14px 8px #fdba74, 0 0 0 0 #fff0;
+}
+@keyframes pulse-marker {
+  0% { transform: scale(1); filter: brightness(1.2);}
+  100% { transform: scale(1.25); filter: brightness(2);}
 }
 </style>

@@ -33,3 +33,12 @@ a,
     padding: 0 2rem;
   }
 }
+
+.marker-animate {
+  animation: pulse-marker 0.5s alternate 4;
+  box-shadow: 0 0 14px 8px #fdba74, 0 0 0 0 #fff0;
+}
+@keyframes pulse-marker {
+  0% { transform: scale(1); filter: brightness(1.2);}
+  100% { transform: scale(1.25); filter: brightness(2);}
+}

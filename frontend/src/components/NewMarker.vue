@@ -145,7 +145,6 @@
         @click="$emit('close')"
       >❌ Anuluj</button>
       <button
-        @click="handleSubmit()"
         type="submit"
         class="py-2 px-8 rounded-xl bg-gradient-to-r from-lime-300 via-green-200 to-emerald-200 text-green-800 font-extrabold text-lg shadow-xl hover:scale-110 hover:shadow-green-300 transition-all duration-200 fairy-shadow flex items-center gap-2"
         :disabled="!formValid"
@@ -240,7 +239,7 @@ const formValid = computed(() =>
   latitude.value && longitude.value &&
   code.value
 )
-async function handleSubmit() {
+function handleSubmit() {
   if (!formValid.value) return
   const payload = {
     name: name.value,
@@ -251,22 +250,8 @@ async function handleSubmit() {
     longitude: longitude.value,
     access_code: code.value
   }
-
-  try {
-    const res = await axios.post(
-      import.meta.env.VITE_API_URL + '/points',
-      payload
-    )
-    // Możesz tu dać snackbar/toast/sukces!
-    alert('Dodano punkt! 🎉')
-    emit('submit', res.data) // zamknij formularz, zaktualizuj mapę itd.
-  } catch (e) {
-    if (e.response && e.response.status === 401) {
-      alert('Niepoprawny kod autoryzacyjny!')
-    } else {
-      alert('Nie udało się dodać punktu. Spróbuj ponownie.')
-    }
-  }
+  // Emituj tylko dane do rodzica!
+  emit('submit', payload)
 }
 // function handleSubmit() {
 //   if (!formValid.value) return
@@ -347,5 +332,14 @@ async function handleSubmit() {
   input, textarea, select, button {
     font-size: 1.12rem;
   }
+}
+
+.marker-animate {
+  animation: pulse-marker 0.5s alternate 4;
+  box-shadow: 0 0 14px 8px #fdba74, 0 0 0 0 #fff0;
+}
+@keyframes pulse-marker {
+  0% { transform: scale(1); filter: brightness(1.2);}
+  100% { transform: scale(1.25); filter: brightness(2);}
 }
 </style>

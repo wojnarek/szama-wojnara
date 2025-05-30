@@ -3,7 +3,7 @@ from app.routers import points
 from fastapi.middleware.cors import CORSMiddleware
 import os
 
-app = FastAPI(root_path="/api")
+app = FastAPI(root_path="/api", docs_url=None, redoc_url=None, openapi_url=None)
 
 origins = os.getenv("CORS_ORIGINS", "")
 origins = [o.strip() for o in origins.split(",") if o.strip()]

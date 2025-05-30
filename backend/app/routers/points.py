@@ -30,10 +30,15 @@ async def getPointDetails(point_id: str):
 @router.post("/", response_model=PointDetails)
 async def addNewPoint(newPoint: NewPoint):
 
+    print(f"{newPoint}")
+
     user = checkAccesCode(newPoint.access_code)
     
     if not user:
         raise HTTPException(status_code=401, detail="Niepoprawny kod dostępu!")
-    addNewPointToDB(newPoint, user)
-    return newPoint
+    newPointFromDb = addNewPointToDB(newPoint, user)
+    
+    print(f"nowy punkt: {newPointFromDb}")
+        
+    return PointDetails(**newPointFromDb)
     

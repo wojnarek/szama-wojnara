@@ -72,3 +72,5 @@ def addNewPointToDB(newPoint: NewPoint, user: dict):
     
     point_table.put_item(Item=point)
     
+    return point
+    
