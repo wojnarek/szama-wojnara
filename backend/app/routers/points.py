@@ -41,4 +41,8 @@ async def addNewPoint(newPoint: NewPoint):
     print(f"nowy punkt: {newPointFromDb}")
         
     return PointDetails(**newPointFromDb)
+
+@router.get("/health")
+async def health_check():
+    return {"status": "ok"}
     
