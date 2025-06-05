@@ -18,4 +18,9 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url))
     },
   },
+  server: {
+    host: process.env.VITE_HOST || '0.0.0.0',
+    port: process.env.VITE_PORT || 80,        
+    strictPort: true
+  }
 })
